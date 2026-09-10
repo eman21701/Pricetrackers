@@ -5,12 +5,21 @@
   "description": "Senior Design II price comparison prototype",
   "type": "module",
   "scripts": {
-  "start": "node src/server.js",
-  "test": "node --test tests/unit/ComparisonService.test.js"
+    "start": "node src/server.js",
+    "test": "node --test tests/unit/ComparisonService.test.js",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "express": "5.2.1",
     "knex": "3.3.0",
     "pg": "8.23.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.10.0",
+    "globals": "17.12.0",
+    "prettier": "3.9.6"
   }
 }

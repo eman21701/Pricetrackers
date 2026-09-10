@@ -8,7 +8,8 @@ exports.up = async function (knex) {
     table.string("name", 255).notNullable();
     table.string("brand", 100).notNullable();
     table.string("model", 100).notNullable();
-    table.timestamp("created_at", { useTz: true })
+    table
+      .timestamp("created_at", { useTz: true })
       .notNullable()
       .defaultTo(knex.fn.now());
 
@@ -23,13 +24,15 @@ exports.up = async function (knex) {
   await knex.schema.createTable("offers", (table) => {
     table.increments("id").primary();
 
-    table.integer("product_id")
+    table
+      .integer("product_id")
       .notNullable()
       .references("id")
       .inTable("products")
       .onDelete("RESTRICT");
 
-    table.integer("retailer_id")
+    table
+      .integer("retailer_id")
       .notNullable()
       .references("id")
       .inTable("retailers")
@@ -40,7 +43,8 @@ exports.up = async function (knex) {
     table.string("currency", 3).notNullable().defaultTo("USD");
     table.boolean("is_synthetic").notNullable().defaultTo(true);
 
-    table.timestamp("observed_at", { useTz: true })
+    table
+      .timestamp("observed_at", { useTz: true })
       .notNullable()
       .defaultTo(knex.fn.now());
 

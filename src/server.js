@@ -70,9 +70,11 @@ class PriceTrackersApplication {
       const rawId = request.params.id;
       const id = Number(rawId);
 
-      if (!/^[1-9]\d*$/.test(rawId) ||
-          !Number.isSafeInteger(id) ||
-          id > 2147483647) {
+      if (
+        !/^[1-9]\d*$/.test(rawId) ||
+        !Number.isSafeInteger(id) ||
+        id > 2147483647
+      ) {
         return response.status(400).json({
           error: "Product ID must be a valid positive integer.",
           code: "INVALID_PRODUCT_ID"
@@ -94,7 +96,8 @@ class PriceTrackersApplication {
         product,
         offers,
         comparison: this.#comparison.compare(offers),
-        notice: "Prototype demo data. Synthetic offers are not live retailer prices. Item prices exclude shipping and tax."
+        notice:
+          "Prototype demo data. Synthetic offers are not live retailer prices. Item prices exclude shipping and tax."
       });
     });
 
@@ -111,7 +114,9 @@ class PriceTrackersApplication {
       const invalidJson = error.type === "entity.parse.failed";
 
       response.status(invalidJson ? 400 : 500).json({
-        error: invalidJson ? "Invalid JSON body." : "Unable to process request.",
+        error: invalidJson
+          ? "Invalid JSON body."
+          : "Unable to process request.",
         code: invalidJson ? "INVALID_JSON" : "INTERNAL_ERROR"
       });
     });

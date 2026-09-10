@@ -29,14 +29,9 @@ exports.seed = async function (knex) {
     const retailerIds = {};
 
     for (const name of ["Walmart", "Amazon"]) {
-      await trx("retailers")
-        .insert({ name })
-        .onConflict("name")
-        .ignore();
+      await trx("retailers").insert({ name }).onConflict("name").ignore();
 
-      const retailer = await trx("retailers")
-        .where({ name })
-        .first();
+      const retailer = await trx("retailers").where({ name }).first();
 
       retailerIds[name] = retailer.id;
     }

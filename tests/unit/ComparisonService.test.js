@@ -73,10 +73,7 @@ test("handles one offer without inventing a price difference", () => {
 });
 
 test("accepts a zero-cent offer", () => {
-  const result = service.compare([
-    offer("Amazon", 0),
-    offer("Walmart", 100)
-  ]);
+  const result = service.compare([offer("Amazon", 0), offer("Walmart", 100)]);
 
   assert.equal(result.lowest_price_cents, 0);
   assert.equal(result.price_difference_cents, 100);
@@ -99,10 +96,7 @@ test("rejects unsupported currencies", () => {
 });
 
 test("does not modify the original offers", () => {
-  const offers = [
-    offer("Amazon", 5499),
-    offer("Walmart", 4999)
-  ];
+  const offers = [offer("Amazon", 5499), offer("Walmart", 4999)];
   const original = structuredClone(offers);
 
   service.compare(offers);

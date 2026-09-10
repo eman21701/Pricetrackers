@@ -17,11 +17,14 @@ export class ComparisonService {
       };
     }
 
-    if (offers.some((offer) =>
-      offer.currency !== "USD" ||
-      !Number.isInteger(offer.price_cents) ||
-      offer.price_cents < 0
-    )) {
+    if (
+      offers.some(
+        (offer) =>
+          offer.currency !== "USD" ||
+          !Number.isInteger(offer.price_cents) ||
+          offer.price_cents < 0
+      )
+    ) {
       throw new Error("Comparison requires nonnegative integer USD prices.");
     }
 
