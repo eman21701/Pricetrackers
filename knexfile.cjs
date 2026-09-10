@@ -11,6 +11,10 @@ module.exports = {
     migrations: {
       directory: "./migrations",
       loadExtensions: [".cjs"]
+    },
+    seeds: {
+      directory: "./seeds",
+      loadExtensions: [".cjs"]
     }
   }
 };

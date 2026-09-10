@@ -8,6 +8,7 @@ RUN npm ci --omit=dev
 COPY --chown=node:node src ./src
 COPY --chown=node:node knexfile.cjs ./
 COPY --chown=node:node migrations ./migrations
+COPY --chown=node:node seeds ./seeds
 
 USER node
 
