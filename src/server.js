@@ -1,12 +1,18 @@
 import express from "express";
+import { Database } from "./Database.js";
 
 /**
  * Configures the PriceTrackers HTTP API.
  */
 class PriceTrackersApplication {
   #app;
+  #database;
 
-  constructor() {
+  /**
+   * @param {Database} database Application database access.
+   */
+  constructor(database) {
+    this.#database = database;
     this.#app = express();
     this.#app.disable("x-powered-by");
     this.#app.use(express.json());
@@ -16,6 +22,24 @@ class PriceTrackersApplication {
         status: "ok",
         service: "pricetrackers-api"
       });
+    });
+
+    this.#app.get("/ready", async (_request, response) => {
+      try {
+        await this.#database.checkConnection();
+
+        response.status(200).json({
+          status: "ready",
+          database: "connected"
+        });
+      } catch (error) {
+        console.error("Database readiness check failed:", error.message);
+
+        response.status(503).json({
+          status: "not_ready",
+          database: "unavailable"
+        });
+      }
     });
   }
 
@@ -36,5 +60,6 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error("PORT must be an integer between 1 and 65535.");
 }
 
-const application = new PriceTrackersApplication();
+const database = new Database();
+const application = new PriceTrackersApplication(database);
 application.start(port);

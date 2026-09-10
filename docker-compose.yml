@@ -5,6 +5,14 @@ services:
       - "127.0.0.1:3000:3000"
     environment:
       PORT: "3000"
+      PGHOST: database
+      PGPORT: "5432"
+      PGDATABASE: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      PGUSER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    depends_on:
+      database:
+        condition: service_healthy
 
   database:
     image: postgres:17
