@@ -3,7 +3,7 @@ import pg from "pg";
 const { Pool } = pg;
 
 /**
- * Manages PostgreSQL connections for the application.
+ * Manages PostgreSQL connections and parameterized queries.
  */
 export class Database {
   #pool;
@@ -21,10 +21,20 @@ export class Database {
   }
 
   /**
+   * Executes SQL with separately supplied parameter values.
+   * @param {string} text SQL statement.
+   * @param {Array} values Parameter values.
+   * @returns {Promise<import("pg").QueryResult>}
+   */
+  async query(text, values = []) {
+    return this.#pool.query(text, values);
+  }
+
+  /**
    * Verifies that PostgreSQL can execute a query.
    * @returns {Promise<void>}
    */
   async checkConnection() {
-    await this.#pool.query("SELECT 1");
+    await this.query("SELECT 1");
   }
 }
