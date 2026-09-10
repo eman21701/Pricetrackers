@@ -15,18 +15,19 @@ jobs:
     name: Lint, formatting, and unit tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     defaults:
       run:
         shell: bash
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: npm
@@ -41,16 +42,55 @@ jobs:
         run: npm run lint 2>&1 | tee "$RUNNER_TEMP/verification/lint.log"
 
       - name: Check formatting
+        if: ${{ !cancelled() }}
         run: npm run format:check 2>&1 | tee "$RUNNER_TEMP/verification/format.log"
 
       - name: Run unit tests
+        if: ${{ !cancelled() }}
         run: npm test 2>&1 | tee "$RUNNER_TEMP/verification/unit-tests.log"
 
       - name: Upload verification logs
-        if: always()
-        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
         with:
           name: quality-logs-${{ github.run_id }}
           path: ${{ runner.temp }}/verification/
+          retention-days: 30
+          if-no-files-found: warn
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out full repository history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Create log directory
+        run: mkdir -p "$RUNNER_TEMP/secret-reports"
+
+      - name: Scan Git history with Gitleaks
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE:/repo:ro" \
+            ghcr.io/gitleaks/gitleaks:v8.24.2 \
+            git /repo --redact --no-banner \
+            2>&1 | tee "$RUNNER_TEMP/secret-reports/gitleaks.log"
+
+      - name: Upload secret scan log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: secret-scan-logs-${{ github.run_id }}
+          path: ${{ runner.temp }}/secret-reports/
           retention-days: 30
           if-no-files-found: warn
