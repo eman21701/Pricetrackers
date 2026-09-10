@@ -5,7 +5,8 @@
   "description": "Senior Design II price comparison prototype",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js"
+  "start": "node src/server.js",
+  "test": "node --test tests/unit/ComparisonService.test.js"
   },
   "dependencies": {
     "express": "5.2.1",
