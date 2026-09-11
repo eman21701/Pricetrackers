@@ -1,4 +1,22 @@
 /**
+ * @typedef {Object} Product
+ * @property {number} id
+ * @property {string} name
+ * @property {string} brand
+ * @property {string} model
+ */
+
+/**
+ * @typedef {Object} Offer
+ * @property {number} id
+ * @property {string} retailer
+ * @property {number} price_cents
+ * @property {string} currency
+ * @property {boolean} is_synthetic
+ * @property {Date} observed_at
+ */
+
+/**
  * Retrieves product catalog data from PostgreSQL.
  */
 export class ProductRepository {
@@ -15,7 +33,7 @@ export class ProductRepository {
    * Searches names, brands, and models using literal substring matching.
    * Returns at most 50 products.
    * @param {string} search Search text.
-   * @returns {Promise<Array>}
+   * @returns {Promise<Product[]>}
    */
   async search(search) {
     const result = await this.#database.query(
@@ -36,7 +54,7 @@ export class ProductRepository {
   /**
    * Retrieves one product.
    * @param {number} id Product identifier.
-   * @returns {Promise<object|null>}
+   * @returns {Promise<Product | null>}
    */
   async findById(id) {
     const result = await this.#database.query(
@@ -50,7 +68,7 @@ export class ProductRepository {
   /**
    * Retrieves offers ordered by price, then retailer name.
    * @param {number} productId Product identifier.
-   * @returns {Promise<Array>}
+   * @returns {Promise<Offer[]>}
    */
   async findOffers(productId) {
     const result = await this.#database.query(

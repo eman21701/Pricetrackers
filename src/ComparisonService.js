@@ -4,7 +4,7 @@
 export class ComparisonService {
   /**
    * Summarizes offers without modifying the supplied array.
-   * @param {Array} offers Stored retailer offers.
+   * @param {Array<{retailer: string, price_cents: number, currency: string}>} offers Stored retailer offers.
    * @returns {object} Price comparison summary.
    */
   compare(offers) {

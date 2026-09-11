@@ -41,6 +41,10 @@ jobs:
       - name: Run ESLint
         run: npm run lint 2>&1 | tee "$RUNNER_TEMP/verification/lint.log"
 
+      - name: Check JavaScript types
+        if: ${{ !cancelled() }}
+        run: npm run typecheck 2>&1 | tee "$RUNNER_TEMP/verification/typecheck.log"
+
       - name: Check formatting
         if: ${{ !cancelled() }}
         run: npm run format:check 2>&1 | tee "$RUNNER_TEMP/verification/format.log"

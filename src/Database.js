@@ -23,7 +23,7 @@ export class Database {
   /**
    * Executes SQL with separately supplied parameter values.
    * @param {string} text SQL statement.
-   * @param {Array} values Parameter values.
+   * @param {Array<string | number | boolean | null>} values Parameter values.
    * @returns {Promise<import("pg").QueryResult>}
    */
   async query(text, values = []) {

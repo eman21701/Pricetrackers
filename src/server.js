@@ -34,12 +34,17 @@ class PriceTrackersApplication {
     this.#app.get("/ready", async (_request, response) => {
       try {
         await this.#database.checkConnection();
+
         response.status(200).json({
           status: "ready",
           database: "connected"
         });
       } catch (error) {
-        console.error("Database readiness check failed:", error.message);
+        console.error(
+          "Database readiness check failed:",
+          error instanceof Error ? error.message : String(error)
+        );
+
         response.status(503).json({
           status: "not_ready",
           database: "unavailable"
@@ -108,10 +113,23 @@ class PriceTrackersApplication {
       });
     });
 
-    this.#app.use((error, _request, response, _next) => {
-      console.error("API request failed:", error.message);
+    /** @type {import("express").ErrorRequestHandler} */
+    const handleError = (
+      /** @type {unknown} */ error,
+      _request,
+      response,
+      _next
+    ) => {
+      console.error(
+        "API request failed:",
+        error instanceof Error ? error.message : String(error)
+      );
 
-      const invalidJson = error.type === "entity.parse.failed";
+      const invalidJson =
+        typeof error === "object" &&
+        error !== null &&
+        "type" in error &&
+        error.type === "entity.parse.failed";
 
       response.status(invalidJson ? 400 : 500).json({
         error: invalidJson
@@ -119,7 +137,9 @@ class PriceTrackersApplication {
           : "Unable to process request.",
         code: invalidJson ? "INVALID_JSON" : "INTERNAL_ERROR"
       });
-    });
+    };
+
+    this.#app.use(handleError);
   }
 
   /**
