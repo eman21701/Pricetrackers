@@ -29,6 +29,7 @@ The prices we compare do not include tax or shipping.
 ## Setting up the project
 
 You will need Git, Docker Desktop, and access to this repository.
+
 On Windows, Docker Desktop needs WSL 2 configured.
 
 Open Docker Desktop before starting. You do not need to install Node.js
@@ -90,12 +91,12 @@ The backend should say it is running, and the database should say healthy.
 
 Open these addresses in your browser:
 
-| Address                                              | What it does                                      |
-| ---------------------------------------------------- | ------------------------------------------------- |
-| http://localhost:3000/health                         | Checks whether the backend responds               |
-| http://localhost:3000/ready                          | Checks whether the backend can reach the database |
-| http://localhost:3000/api/products                   | Lists the products                                |
-| http://localhost:3000/api/products?search=headphones | Searches for headphones                           |
+| Address                                                                                                      | What it does                                      |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| [http://localhost:3000/health](http://localhost:3000/health)                                                 | Checks whether the backend responds               |
+| [http://localhost:3000/ready](http://localhost:3000/ready)                                                   | Checks whether the backend can reach the database |
+| [http://localhost:3000/api/products](http://localhost:3000/api/products)                                     | Lists the products                                |
+| [http://localhost:3000/api/products?search=headphones](http://localhost:3000/api/products?search=headphones) | Searches for headphones                           |
 
 To see a product's offers, use:
 
@@ -106,6 +107,7 @@ http://localhost:3000/api/products/PRODUCT_ID/offers
 Replace `PRODUCT_ID` with the ID shown in the search results.
 
 Prices in the response are in cents for now. For example, `4999` means $49.99.
+
 The `is_synthetic` field identifies our made-up offers.
 
 ## Sample data
@@ -133,6 +135,7 @@ and 6 offers. Running the seed command again should not add duplicates.
 | `.github/workflows/ci.yml` | Runs checks on GitHub                      |
 
 The database currently has three main tables: `products`, `retailers`, and `offers`.
+
 Each offer connects a product to a retailer and stores its price.
 
 ## Running the tests and checks
@@ -157,6 +160,12 @@ Check the JavaScript code:
 docker run --rm --mount "type=bind,source=$($PWD.Path),target=/app" -w /app node:24-bookworm-slim npm run lint
 ```
 
+Check the JavaScript types:
+
+```powershell
+docker run --rm --mount "type=bind,source=$($PWD.Path),target=/app" -w /app node:24-bookworm-slim npm run typecheck
+```
+
 Check formatting:
 
 ```powershell
@@ -168,12 +177,13 @@ To fix the formatting, use the same Docker command with `npm run format`.
 We currently have nine unit tests for the comparison code. These do not
 test the entire application or every database operation.
 
-GitHub Actions also runs the tests, linting, formatting checks, and a
-secret scan. The results are available in the repository's Actions tab.
+GitHub Actions also runs the tests, type checking, linting, formatting checks,
+and a secret scan. The results are available in the repository's Actions tab.
 
 ## Testing database rollback
 
 Rollback removes the application tables and everything stored in them.
+
 Only do this with a local test database whose data you can replace.
 
 ```powershell
@@ -208,21 +218,33 @@ docker compose down
 
 This keeps the database data. Adding `--volumes` deletes that data.
 
+## Project documentation
+
+Additional project documentation is available here:
+
+- [Developer Guide](docs/DEVELOPER_GUIDE.md) - detailed setup, development, testing, and troubleshooting information
+- [Changelog](CHANGELOG.md) - summary of notable project changes
+- [AI Usage & Verification Log](AI_USAGE_LOG.md) - record of AI-assisted work and how it was reviewed and verified
+
 ## Working as a team
 
 We use GitHub Issues to track tasks and bugs. Changes are made on branches
 and submitted through pull requests for a teammate to review.
 
 Commit messages use prefixes such as `feat:`, `fix:`, `test:`, and `docs:`.
+
 Pull requests should reference the issues they address.
 
 ## AI use
 
 We used ChatGPT to help plan the prototype, generate initial code and tests,
-draft documentation, and troubleshoot setup problems. We checked the
-generated work by running it locally on our own individual machines, checking API responses, testing database migrations and rollback, and running automated tests and code checks.
+draft documentation, and troubleshoot setup problems. AI-generated work was
+reviewed and verified by running the application locally, checking API
+responses, testing database migrations and rollback, and running automated
+tests and code checks.
 
-Our AI prompts, changes, and verification results are being recorded in `AI_USAGE_LOG.md`.
+Our AI prompts, changes, and verification results are recorded in
+[AI_USAGE_LOG.md](AI_USAGE_LOG.md).
 
 ## What is not finished yet
 
@@ -230,7 +252,4 @@ Prototype 1 does not have live retailer data, a finished frontend,
 user accounts, wishlists, or price history.
 
 Products are matched manually in our sample data. Searches return up to
-50 products. We currently support USD prices only.
-
-Full static type checking and the detailed developer guide are still
-being completed.
+50 products, and we currently support USD prices only.

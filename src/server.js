@@ -131,7 +131,7 @@ class PriceTrackersApplication {
         "type" in error &&
         error.type === "entity.parse.failed";
 
-      response.status(invalidJson ? 400 : 500).json({
+      return response.status(invalidJson ? 400 : 500).json({
         error: invalidJson
           ? "Invalid JSON body."
           : "Unable to process request.",
