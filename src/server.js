@@ -24,6 +24,15 @@ class PriceTrackersApplication {
     this.#app = express();
     this.#app.disable("x-powered-by");
     this.#app.use(express.json());
+    this.#app.use((request, response, next) => {
+        const origin = request.headers.origin;
+        const allowed = new Set(["http://localhost:4173", "http://127.0.0.1:4173"]);
+        if (origin && allowed.has(origin)) {
+          response.setHeader("Access-Control-Allow-Origin", origin);
+          response.setHeader("Vary", "Origin");
+  }
+  next();
+});
 
     this.#app.get("/health", (_request, response) => {
       response.status(200).json({
@@ -52,7 +61,8 @@ class PriceTrackersApplication {
         });
       }
     });
-
+registerLiveSearch(this.#app);
+    
     this.#app.get("/api/products", async (request, response) => {
       const search = request.query.search ?? "";
 
