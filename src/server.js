@@ -51,7 +51,8 @@ class PriceTrackersApplication {
         });
       }
     });
-
+registerLiveSearch(this.#app);
+    
     this.#app.get("/api/products", async (request, response) => {
       const search = request.query.search ?? "";
 
