@@ -2,7 +2,7 @@ import express from "express";
 import { Database } from "./Database.js";
 import { ProductRepository } from "./ProductRepository.js";
 import { ComparisonService } from "./ComparisonService.js";
-
+import { registerLiveSearch } from "./LiveSearch.js";
 /**
  * Configures the PriceTrackers HTTP API.
  */
