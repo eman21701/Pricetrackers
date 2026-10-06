@@ -109,7 +109,6 @@ function amazonOffers(body) {
   const results = Array.isArray(body.organic_results)
     ? body.organic_results
     : [];
-  
   return results
     .filter((/** @type {any} */ item) =>
       Number.isFinite(item.primary_offer?.offer_price)
@@ -135,7 +134,6 @@ function walmartOffers(body) {
   const results = Array.isArray(body.organic_results)
     ? body.organic_results
     : [];
-  
   return results
     .filter((/** @type {any} */ item) =>
       Number.isFinite(item.primary_offer?.offer_price)
