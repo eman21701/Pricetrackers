@@ -109,13 +109,13 @@ function amazonOffers(body) {
   const results = Array.isArray(body.organic_results)
     ? body.organic_results
     : [];
-
-return results
-  .filter((/** @type {any} */ item) =>
-    Number.isFinite(item.primary_offer?.offer_price)
-  )
-  .slice(0, 8)
-.map((/** @type {any} */ item) => ({
+  
+  return results
+    .filter((/** @type {any} */ item) =>
+      Number.isFinite(item.primary_offer?.offer_price)
+    )
+    .slice(0, 8)
+    .map((/** @type {any} */ item) => ({
       id: String(item.asin),
       title: String(item.title),
       price_cents: Math.round(item.extracted_price * 100),
