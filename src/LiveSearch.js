@@ -135,13 +135,13 @@ function walmartOffers(body) {
   const results = Array.isArray(body.organic_results)
     ? body.organic_results
     : [];
-
+  
   return results
     .filter((/** @type {any} */ item) =>
-  Number.isFinite(item.primary_offer?.offer_price)
-)
-.slice(0, 8)
-.map((/** @type {any} */ item) => ({
+      Number.isFinite(item.primary_offer?.offer_price)
+    )
+    .slice(0, 8)
+    .map((/** @type {any} */ item) => ({
       id: String(item.us_item_id),
       title: String(item.title),
       price_cents: Math.round(item.primary_offer.offer_price * 100),
