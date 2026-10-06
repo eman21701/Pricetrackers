@@ -110,11 +110,11 @@ function amazonOffers(body) {
     ? body.organic_results
     : [];
 
-  return results
-    .filter((/** @type {any} */ item) =>
-  Number.isFinite(item.primary_offer?.offer_price)
-)
-.slice(0, 8)
+return results
+  .filter((/** @type {any} */ item) =>
+    Number.isFinite(item.primary_offer?.offer_price)
+  )
+  .slice(0, 8)
 .map((/** @type {any} */ item) => ({
       id: String(item.asin),
       title: String(item.title),
