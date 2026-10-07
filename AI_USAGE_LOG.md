@@ -213,3 +213,35 @@ I certify as Team Lead that all entries above accurately represent AI usage with
 
 **Team Lead Signature:** Eric Woods
 **Date:** 9/10/2026
+
+## Entry 5: Prototype 2 — Live search, accounts, and submission controls
+
+- **Date:** October 4, 2026
+- **Team Member:** Katrina Nghambi
+- **Tool Used:** ChatGpt
+- **Associated Git Issue:** Prototype 2 Alpha verification
+- **Assigned Peer Reviewer:** Eric Woods
+- **Assigned Independent Tester:** Tako Nyapadi
+
+### Exact Prompt Submitted:
+
+> Help connect the PriceTrackers frontend to the Express API, add email signup and login stored in PostgreSQL, and map the Prototype 2 requirements for the Alpha demo, security review, and CI logs.
+
+### AI Output Summary & Code Generated:
+
+Drafted the live-search route, the session-based auth module, the frontend, the users and sessions migration, and the Prototype 2 requirement map.
+
+### Human Review, Refactoring & Modifications Made:
+
+- The API key was placed in `.env` and passed through Docker Compose, not committed.
+- Signup was verified with `Invoke-RestMethod` and returned user id 1 without a password.
+- CI failures for missing imports, implicit `any`, and Prettier were fixed before merge.
+- Wishlist remains local and is not claimed as a database feature yet.
+- Google OAuth was not enabled for this tag.
+
+### Verification & Testing Method:
+
+- `GET /health` returned ok.
+- `GET /api/live-search?q=blender` returned priced Walmart rows.
+- Signup and login returned the user and stored a session.
+- GitHub Actions quality and secret-scan logs are attached to the Prototype 2 issue.
