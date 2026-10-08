@@ -63,26 +63,26 @@ export function registerAuth(app, database) {
     response.json({ user: { id: user.id, name: user.name, email: user.email } });
   });
 
-  app.get("/api/auth/me", async (request, response) => {
-    const token = readCookie(request.headers.cookie, "pt_session");
-    if (!token) return response.json({ user: null });
+   app.get("/api/auth/me", async (request, response) => {
+     const token = readCookie(request.headers.cookie, "pt_session");
+     if (!token) return response.json({ user: null });
 
-    const found = await database.query(
-      `SELECT u.id, u.name, u.email
-       FROM sessions s
-       JOIN users u ON u.id = s.user_id
-       WHERE s.token = $1 AND s.expires_at > NOW()`,
-      [token]
-    );
-    response.json({ user: found.rows[0] ?? null });
-  });
+     const found = await database.query(
+       `SELECT u.id, u.name, u.email
+        FROM sessions s
+        JOIN users u ON u.id = s.user_id
+        WHERE s.token = $1 AND s.expires_at > NOW()`,
+       [token]
+     );
+     response.json({ user: found.rows[0] ?? null });
+   });
 
-app.post("/api/auth/logout", async (request, response) => {
-  const token = readCookie(request.headers.cookie, "pt_session");
-  if (token) await database.query("DELETE FROM sessions WHERE token = $1", [token]);
-  response.setHeader("Set-Cookie", "pt_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0");
-  response.json({ ok: true });
-});
+   app.post("/api/auth/logout", async (request, response) => {  // ← Proper indentation
+     const token = readCookie(request.headers.cookie, "pt_session");
+     if (token) await database.query("DELETE FROM sessions WHERE token = $1", [token]);
+     response.setHeader("Set-Cookie", "pt_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0");
+     response.json({ ok: true });
+   });
 
 }
 
