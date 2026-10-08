@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   quality:
-    name: Lint, formatting, and unit tests
+    name: Lint, types, formatting, unit tests, and dependency audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -53,12 +53,78 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm test 2>&1 | tee "$RUNNER_TEMP/verification/unit-tests.log"
 
+      - name: Audit dependencies
+        if: ${{ !cancelled() }}
+        run: npm audit --audit-level=low 2>&1 | tee "$RUNNER_TEMP/verification/dependency-audit.log"
+
       - name: Upload verification logs
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
           name: quality-logs-${{ github.run_id }}
           path: ${{ runner.temp }}/verification/
+          retention-days: 30
+          if-no-files-found: warn
+
+  integration:
+    name: Integration tests and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Create log directory
+        run: mkdir -p "$RUNNER_TEMP/integration"
+
+      - name: Start isolated test database
+        run: |
+          docker compose -p pricetrackers-tests -f compose.test.yml \
+            up -d --wait test-database \
+            2>&1 | tee "$RUNNER_TEMP/integration/database-startup.log"
+
+      - name: Run tests with coverage thresholds
+        run: |
+          docker compose -p pricetrackers-tests -f compose.test.yml \
+            run --rm -T test-runner /bin/sh -c '
+              npm ci &&
+              node --test \
+                --test-concurrency=1 \
+                --experimental-test-coverage \
+                --test-coverage-include="src/**/*.js" \
+                --test-coverage-lines=60 \
+                --test-coverage-branches=60 \
+                --test-coverage-functions=60 \
+                tests/unit/*.test.js \
+                tests/integration/*.test.js
+            ' 2>&1 | tee "$RUNNER_TEMP/integration/tests-and-coverage.log"
+
+      - name: Collect database logs
+        if: ${{ always() }}
+        run: |
+          docker compose -p pricetrackers-tests -f compose.test.yml \
+            logs --no-color test-database \
+            2>&1 | tee "$RUNNER_TEMP/integration/database.log"
+
+      - name: Stop test containers
+        if: ${{ always() }}
+        run: |
+          docker compose -p pricetrackers-tests -f compose.test.yml \
+            down --volumes --remove-orphans
+
+      - name: Upload integration logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-logs-${{ github.run_id }}
+          path: ${{ runner.temp }}/integration/
           retention-days: 30
           if-no-files-found: warn
 

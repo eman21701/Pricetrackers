@@ -1,0 +1,40 @@
+services:
+  test-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pricetrackers_test
+      POSTGRES_USER: pricetrackers_test
+      POSTGRES_PASSWORD: local_test_only
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U pricetrackers_test -d pricetrackers_test
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  test-runner:
+    image: node:24-bookworm-slim
+    working_dir: /app
+    environment:
+      NODE_ENV: test
+      PGHOST: test-database
+      PGPORT: "5432"
+      PGDATABASE: pricetrackers_test
+      PGUSER: pricetrackers_test
+      PGPASSWORD: local_test_only
+    volumes:
+      - .:/app
+      - test_node_modules:/app/node_modules
+    depends_on:
+      test-database:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - "-c"
+      - "npm ci && node --test --test-concurrency=1 tests/unit/*.test.js tests/integration/*.test.js"
+
+volumes:
+  test_node_modules:

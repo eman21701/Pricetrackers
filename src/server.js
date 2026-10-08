@@ -1,5 +1,4 @@
 import express from "express";
-import { Database } from "./Database.js";
 import { ProductRepository } from "./ProductRepository.js";
 import { ComparisonService } from "./ComparisonService.js";
 import { registerLiveSearch } from "./LiveSearch.js";
@@ -7,14 +6,14 @@ import { registerAuth } from "./Auth.js";
 /**
  * Configures the PriceTrackers HTTP API.
  */
-class PriceTrackersApplication {
+export class PriceTrackersApplication {
   #app;
   #database;
   #products;
   #comparison;
 
   /**
-   * @param {Database} database Application database access.
+   * @param {import("./Database.js").Database} database Application database access.
    */
   constructor(database) {
     this.#database = database;
@@ -187,13 +186,3 @@ class PriceTrackersApplication {
     });
   }
 }
-
-const port = Number(process.env.PORT ?? 3000);
-
-if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  throw new Error("PORT must be an integer between 1 and 65535.");
-}
-
-const database = new Database();
-const application = new PriceTrackersApplication(database);
-application.start(port);
