@@ -102,6 +102,21 @@ async function serp(apiKey, params) {
 }
 
 /**
+ * @param {any} item Amazon organic result.
+ * @returns {number | null}
+ */
+function amazonCents(item) {
+  if (Number.isFinite(item.extracted_price)) {
+    return Math.round(item.extracted_price * 100);
+  }
+
+  const match = String(item.price ?? "")
+    .replace(/,/g, "")
+    .match(/(\d+\.\d{2})/);
+  return match ? Math.round(Number(match[1]) * 100) : null;
+}
+
+/**
  * @param {any} body SerpAPI Amazon response.
  * @returns {LiveOffer[]}
  */
@@ -109,20 +124,20 @@ function amazonOffers(body) {
   const results = Array.isArray(body.organic_results)
     ? body.organic_results
     : [];
+
   return results
-    .filter((/** @type {any} */ item) =>
-      Number.isFinite(item.primary_offer?.offer_price)
-    )
+    .map((/** @type {any} */ item) => ({ item, cents: amazonCents(item) }))
+    .filter((row) => row.cents != null)
     .slice(0, 8)
-    .map((/** @type {any} */ item) => ({
-      id: String(item.asin),
-      title: String(item.title),
-      price_cents: Math.round(item.extracted_price * 100),
+    .map((row) => ({
+      id: String(row.item.asin),
+      title: String(row.item.title),
+      price_cents: row.cents,
       currency: "USD",
-      rating: typeof item.rating === "number" ? item.rating : null,
-      link: String(item.link_clean || item.link),
-      thumbnail: item.thumbnail ? String(item.thumbnail) : null,
-      sponsored: Boolean(item.sponsored)
+      rating: typeof row.item.rating === "number" ? row.item.rating : null,
+      link: String(row.item.link_clean || row.item.link),
+      thumbnail: row.item.thumbnail ? String(row.item.thumbnail) : null,
+      sponsored: Boolean(row.item.sponsored)
     }));
 }
 
