@@ -3,6 +3,7 @@ import { Database } from "./Database.js";
 import { ProductRepository } from "./ProductRepository.js";
 import { ComparisonService } from "./ComparisonService.js";
 import { registerLiveSearch } from "./LiveSearch.js";
+import { registerAuth } from "./Auth.js";
 /**
  * Configures the PriceTrackers HTTP API.
  */
@@ -23,6 +24,22 @@ class PriceTrackersApplication {
     this.#app = express();
     this.#app.disable("x-powered-by");
     this.#app.use(express.json());
+
+this.#app.use((request, response, next) => {
+  const origin = request.headers.origin;
+  const allowed = new Set([
+    "http://127.0.0.1:4173",
+    "http://localhost:4173"
+  ]);
+  if (origin && allowed.has(origin)) {
+    response.setHeader("Access-Control-Allow-Origin", origin);
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.setHeader("Vary", "Origin");
+  }
+  if (request.method === "OPTIONS") return response.sendStatus(204);
+  next();
+});
 
     this.#app.get("/health", (_request, response) => {
       response.status(200).json({
@@ -53,6 +70,7 @@ class PriceTrackersApplication {
     });
 
     registerLiveSearch(this.#app);
+    registerAuth(this.#app, this.#database);
 
     this.#app.get("/api/products", async (request, response) => {
       const search = request.query.search ?? "";
