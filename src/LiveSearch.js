@@ -127,7 +127,7 @@ function amazonOffers(body) {
 
   return results
     .map((/** @type {any} */ item) => ({ item, cents: amazonCents(item) }))
-    .filter((row) => row.cents != null)
+    .filter((row) => row.cents !== null)
     .slice(0, 8)
     .map((row) => ({
       id: String(row.item.asin),
