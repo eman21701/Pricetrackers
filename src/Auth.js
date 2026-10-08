@@ -77,7 +77,7 @@ export function registerAuth(app, database) {
     response.json({ user: found.rows[0] ?? null });
   });
 
-   app.post("/api/auth/logout", async (request, response) => {
+  app.post("/api/auth/logout", async (request, response) => {
     const token = readCookie(request.headers.cookie, "pt_session");
     if (token) await database.query("DELETE FROM sessions WHERE token = $1", [token]);
   response.setHeader("Set-Cookie", "pt_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0");
