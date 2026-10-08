@@ -63,12 +63,12 @@ export function registerAuth(app, database) {
     response.json({ user: { id: user.id, name: user.name, email: user.email } });
   });
 
-   app.get("/api/auth/me", async (request, response) => {
-     const token = readCookie(request.headers.cookie, "pt_session");
-     if (!token) return response.json({ user: null });
+  app.get("/api/auth/me", async (request, response) => {
+    const token = readCookie(request.headers.cookie, "pt_session");
+    if (!token) return response.json({ user: null });
 
-     const found = await database.query(
-       `SELECT u.id, u.name, u.email
+    const found = await database.query(
+      `SELECT u.id, u.name, u.email
         FROM sessions s
         JOIN users u ON u.id = s.user_id
         WHERE s.token = $1 AND s.expires_at > NOW()`,
