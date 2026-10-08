@@ -91,13 +91,11 @@ export function registerAuth(app, database) {
 
     if (!token) return response.json({ user: null });
 
-const found = await database.query(
-  `SELECT u.id, u.name, u.email
-FROM sessions s
-JOIN users u ON u.id = s.user_id
-WHERE s.token = $1 AND s.expires_at > NOW()`,
-  [token]
-);
+    const found = await database.query(
+      `SELECT u.id, u.name, u.email
+       FROM sessions s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.token = $1 AND s.expires_at > NOW()`,
       [token]
     );
 
