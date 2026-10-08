@@ -24,7 +24,6 @@ class PriceTrackersApplication {
     this.#app = express();
     this.#app.disable("x-powered-by");
     this.#app.use(express.json());
-
 this.#app.use((request, response, next) => {
   const origin = request.headers.origin;
   const allowed = new Set([
