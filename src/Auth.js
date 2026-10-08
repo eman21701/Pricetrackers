@@ -42,6 +42,7 @@ export function registerAuth(app, database) {
       "SELECT id FROM users WHERE email = $1",
       [email]
     );
+
     if (existing.rows.length > 0) {
       return response.status(409).json({
         error: "An account with that email already exists.",
@@ -53,6 +54,7 @@ export function registerAuth(app, database) {
       "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email",
       [name, email, await hashPassword(password)]
     );
+
     await startSession(database, response, created.rows[0].id);
     response.status(201).json({ user: created.rows[0] });
   });
@@ -86,22 +88,24 @@ export function registerAuth(app, database) {
 
   app.get("/api/auth/me", async (request, response) => {
     const token = readCookie(request.headers.cookie, "pt_session");
+
     if (!token) return response.json({ user: null });
 
     const found = await database.query(
-      `SELECT u.id, u.name, u.email
-       FROM sessions s
-       JOIN users u ON u.id = s.user_id
-       WHERE s.token = $1 AND s.expires_at > NOW()`,
+      "SELECT u.id, u.name, u.email FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = $1 AND s.expires_at > NOW()",
       [token]
     );
+
     response.json({ user: found.rows[0] ?? null });
   });
 
   app.post("/api/auth/logout", async (request, response) => {
     const token = readCookie(request.headers.cookie, "pt_session");
-    if (token)
+
+    if (token) {
       await database.query("DELETE FROM sessions WHERE token = $1", [token]);
+    }
+
     response.setHeader(
       "Set-Cookie",
       "pt_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0"
@@ -127,7 +131,9 @@ async function hashPassword(password) {
  */
 async function verifyPassword(password, stored) {
   const [salt, hash] = stored.split(":");
+
   if (!salt || !hash) return false;
+
   const actual = Buffer.from(hash, "hex");
   const expected = await scrypt(password, salt, 64);
   return actual.length === expected.length && timingSafeEqual(actual, expected);
@@ -140,6 +146,7 @@ async function verifyPassword(password, stored) {
  */
 async function startSession(database, response, userId) {
   const token = randomBytes(32).toString("hex");
+
   await database.query(
     "INSERT INTO sessions (token, user_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '7 days')",
     [token, userId]
@@ -157,6 +164,7 @@ async function startSession(database, response, userId) {
  */
 function readCookie(header, name) {
   if (!header) return null;
+
   const match = header
     .split(";")
     .find((part) => part.trim().startsWith(`${name}=`));

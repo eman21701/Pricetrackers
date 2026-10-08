@@ -127,9 +127,12 @@ function amazonOffers(body) {
 
   return results
     .map((/** @type {any} */ item) => ({ item, cents: amazonCents(item) }))
-    .filter((row) => row.cents != null)
+    .filter(
+      (/** @type {{ item: any; cents: number | null }} */ row) =>
+        row.cents !== null
+    )
     .slice(0, 8)
-    .map((row) => ({
+    .map((/** @type {{ item: any; cents: number }} */ row) => ({
       id: String(row.item.asin),
       title: String(row.item.title),
       price_cents: row.cents,
@@ -149,6 +152,7 @@ function walmartOffers(body) {
   const results = Array.isArray(body.organic_results)
     ? body.organic_results
     : [];
+
   return results
     .filter((/** @type {any} */ item) =>
       Number.isFinite(item.primary_offer?.offer_price)
