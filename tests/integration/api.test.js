@@ -193,6 +193,14 @@ test("signup, login, and logout persist and invalidate sessions", async () => {
   assert.equal(current.status, 200);
   assert.equal(current.body.user.id, createdUserId);
 
+  const wishlist = await request("/api/wishlist", {
+    headers: { Cookie: cookie }
+  });
+
+  assert.equal(wishlist.status, 200);
+  assert.deepEqual(wishlist.body.items, []);
+  assert.equal(wishlist.body.count, 0);
+
   const logout = await request("/api/auth/logout", {
     method: "POST",
     headers: { Cookie: cookie }
@@ -212,4 +220,168 @@ test("live search reports missing configuration without contacting SerpAPI", asy
 
   assert.equal(result.status, 503);
   assert.equal(result.body.code, "SEARCH_NOT_CONFIGURED");
+});
+
+test("wishlist rejects missing and invalid sessions", async () => {
+  const anonymous = await request("/api/wishlist");
+
+  assert.equal(anonymous.status, 401);
+  assert.equal(anonymous.body.code, "AUTH_REQUIRED");
+
+  const invalid = await request("/api/wishlist", {
+    headers: { Cookie: "pt_session=invalid-test-token" }
+  });
+
+  assert.equal(invalid.status, 401);
+  assert.equal(invalid.body.code, "AUTH_REQUIRED");
+});
+
+test("wishlist supports CRUD, ownership checks, and soft deletion", async () => {
+  const userIds = [];
+
+  async function createAccount() {
+    const signup = await request(
+      "/api/auth/signup",
+      post({
+        name: "Wishlist Test",
+        email: `wishlist-${randomUUID()}@example.com`,
+        password: "Test-only-password-123!"
+      })
+    );
+
+    assert.equal(signup.status, 201);
+    userIds.push(signup.body.user.id);
+
+    const cookie = signup.headers.get("set-cookie");
+    assert.ok(cookie);
+    return cookie.split(";")[0];
+  }
+
+  function authenticated(cookie, method, body) {
+    return {
+      method,
+      headers: {
+        Cookie: cookie,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    };
+  }
+
+  try {
+    const ownerCookie = await createAccount();
+    const otherCookie = await createAccount();
+
+    const item = {
+      retailer: "Amazon",
+      external_id: "wishlist-test-product",
+      title: "Synthetic Wishlist Test Product",
+      price_cents: 4999,
+      currency: "USD",
+      link: "https://example.com/test-product",
+      thumbnail: null
+    };
+
+    const saved = await request(
+      "/api/wishlist",
+      authenticated(ownerCookie, "POST", item)
+    );
+
+    assert.equal(saved.status, 200);
+    const id = saved.body.id;
+    assert.ok(Number.isInteger(id));
+
+    const duplicate = await request(
+      "/api/wishlist",
+      authenticated(ownerCookie, "POST", item)
+    );
+    assert.equal(duplicate.status, 200);
+    assert.equal(duplicate.body.id, id);
+
+    const listed = await request("/api/wishlist", {
+      headers: { Cookie: ownerCookie }
+    });
+    assert.equal(listed.status, 200);
+    assert.equal(listed.body.count, 1);
+    assert.equal(listed.body.items[0].title, item.title);
+
+    const otherList = await request("/api/wishlist", {
+      headers: { Cookie: otherCookie }
+    });
+    assert.equal(otherList.status, 200);
+    assert.equal(otherList.body.count, 0);
+
+    const forbiddenUpdate = await request(
+      `/api/wishlist/${id}`,
+      authenticated(otherCookie, "PATCH", {
+        target_price_cents: 100
+      })
+    );
+    assert.equal(forbiddenUpdate.status, 404);
+
+    const forbiddenDelete = await request(
+      `/api/wishlist/${id}`,
+      authenticated(otherCookie, "DELETE")
+    );
+    assert.equal(forbiddenDelete.status, 404);
+
+    const invalidTarget = await request(
+      `/api/wishlist/${id}`,
+      authenticated(ownerCookie, "PATCH", {
+        target_price_cents: -1
+      })
+    );
+    assert.equal(invalidTarget.status, 400);
+
+    const updated = await request(
+      `/api/wishlist/${id}`,
+      authenticated(ownerCookie, "PATCH", {
+        target_price_cents: 3999
+      })
+    );
+    assert.equal(updated.status, 200);
+
+    const updatedList = await request("/api/wishlist", {
+      headers: { Cookie: ownerCookie }
+    });
+    assert.equal(updatedList.body.items[0].target_price_cents, 3999);
+
+    const removed = await request(
+      `/api/wishlist/${id}`,
+      authenticated(ownerCookie, "DELETE")
+    );
+    assert.equal(removed.status, 200);
+
+    const afterRemoval = await request("/api/wishlist", {
+      headers: { Cookie: ownerCookie }
+    });
+    assert.equal(afterRemoval.body.count, 0);
+
+    const stored = await database.query(
+      "SELECT deleted_at FROM wishlist_items WHERE id = $1",
+      [id]
+    );
+    assert.equal(stored.rows.length, 1);
+    assert.ok(stored.rows[0].deleted_at);
+
+    const restored = await request(
+      "/api/wishlist",
+      authenticated(ownerCookie, "POST", item)
+    );
+    assert.equal(restored.status, 200);
+    assert.equal(restored.body.id, id);
+
+    const restoredList = await request("/api/wishlist", {
+      headers: { Cookie: ownerCookie }
+    });
+    assert.equal(restoredList.body.count, 1);
+  } finally {
+    // Remove only the disposable records created by this test.
+    for (const userId of userIds) {
+      await database.query("DELETE FROM wishlist_items WHERE user_id = $1", [
+        userId
+      ]);
+      await database.query("DELETE FROM users WHERE id = $1", [userId]);
+    }
+  }
 });

@@ -3,6 +3,7 @@ import { ProductRepository } from "./ProductRepository.js";
 import { ComparisonService } from "./ComparisonService.js";
 import { registerLiveSearch } from "./LiveSearch.js";
 import { registerAuth } from "./Auth.js";
+import { registerWishlist } from "./Wishlist.js";
 /**
  * Configures the PriceTrackers HTTP API.
  */
@@ -33,6 +34,10 @@ export class PriceTrackersApplication {
         response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader(
+          "Access-Control-Allow-Methods",
+          "GET, POST, PATCH, DELETE, OPTIONS"
+        );
         response.setHeader("Vary", "Origin");
       }
       if (request.method === "OPTIONS") return response.sendStatus(204);
@@ -85,6 +90,7 @@ export class PriceTrackersApplication {
 
     registerLiveSearch(this.#app);
     registerAuth(this.#app, this.#database);
+    registerWishlist(this.#app, this.#database);
 
     this.#app.get("/api/products", async (request, response) => {
       const search = request.query.search ?? "";

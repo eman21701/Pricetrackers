@@ -180,3 +180,25 @@ function readCookie(header, name) {
     .find((part) => part.trim().startsWith(`${name}=`));
   return match ? match.trim().slice(name.length + 1) : null;
 }
+
+/**
+ * Finds the signed-in user's ID from an unexpired session.
+ * @param {Database} database Database access.
+ * @param {string | undefined} cookieHeader Request cookies.
+ * @returns {Promise<number | null>}
+ */
+export async function getSessionUserId(database, cookieHeader) {
+  const token = readCookie(cookieHeader, "pt_session");
+
+  if (!token) return null;
+
+  const result = await database.query(
+    `SELECT u.id
+     FROM sessions s
+     JOIN users u ON u.id = s.user_id
+     WHERE s.token = $1 AND s.expires_at > NOW()`,
+    [token]
+  );
+
+  return result.rows[0]?.id ?? null;
+}

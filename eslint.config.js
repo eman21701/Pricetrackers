@@ -8,6 +8,12 @@ export default [
   },
   js.configs.recommended,
   {
+    files: ["frontend/**/*.js"],
+    languageOptions: {
+      globals: globals.browser
+    }
+  },
+  {
     files: ["**/*.js", "**/*.cjs"],
     languageOptions: {
       ecmaVersion: "latest",
