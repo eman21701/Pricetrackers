@@ -37,4 +37,12 @@ export class Database {
   async checkConnection() {
     await this.query("SELECT 1");
   }
+
+  /**
+   * Closes database connections when tests or the application finish.
+   * @returns {Promise<void>}
+   */
+  async close() {
+    await this.#pool.end();
+  }
 }

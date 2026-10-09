@@ -1,20 +1,20 @@
 import express from "express";
-import { Database } from "./Database.js";
 import { ProductRepository } from "./ProductRepository.js";
 import { ComparisonService } from "./ComparisonService.js";
 import { registerLiveSearch } from "./LiveSearch.js";
 import { registerAuth } from "./Auth.js";
+import { registerWishlist } from "./Wishlist.js";
 /**
  * Configures the PriceTrackers HTTP API.
  */
-class PriceTrackersApplication {
+export class PriceTrackersApplication {
   #app;
   #database;
   #products;
   #comparison;
 
   /**
-   * @param {Database} database Application database access.
+   * @param {import("./Database.js").Database} database Application database access.
    */
   constructor(database) {
     this.#database = database;
@@ -34,6 +34,10 @@ class PriceTrackersApplication {
         response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader(
+          "Access-Control-Allow-Methods",
+          "GET, POST, PATCH, DELETE, OPTIONS"
+        );
         response.setHeader("Vary", "Origin");
       }
       if (request.method === "OPTIONS") return response.sendStatus(204);
@@ -86,6 +90,7 @@ class PriceTrackersApplication {
 
     registerLiveSearch(this.#app);
     registerAuth(this.#app, this.#database);
+    registerWishlist(this.#app, this.#database);
 
     this.#app.get("/api/products", async (request, response) => {
       const search = request.query.search ?? "";
@@ -187,13 +192,3 @@ class PriceTrackersApplication {
     });
   }
 }
-
-const port = Number(process.env.PORT ?? 3000);
-
-if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  throw new Error("PORT must be an integer between 1 and 65535.");
-}
-
-const database = new Database();
-const application = new PriceTrackersApplication(database);
-application.start(port);

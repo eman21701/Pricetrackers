@@ -13,6 +13,21 @@ const scrypt = promisify(scryptCallback);
  */
 
 /**
+ * Checks the required signup fields.
+ * @param {string} name Account name.
+ * @param {string} email Email address.
+ * @param {string} password Account password.
+ * @returns {boolean}
+ */
+function isValidSignup(name, email, password) {
+  return (
+    name.length >= 1 &&
+    name.length <= 80 &&
+    email.includes("@") &&
+    password.length >= 8
+  );
+}
+/**
  * Registers signup, login, and current-user routes.
  * @param {ExpressApp} app Express application.
  * @param {Database} database Database access.
@@ -25,12 +40,7 @@ export function registerAuth(app, database) {
       .toLowerCase();
     const password = String(request.body?.password ?? "");
 
-    if (
-      name.length < 1 ||
-      name.length > 80 ||
-      !email.includes("@") ||
-      password.length < 8
-    ) {
+    if (!isValidSignup(name, email, password)) {
       return response.status(400).json({
         error:
           "Name, a valid email, and a password of at least 8 characters are required.",
@@ -169,4 +179,26 @@ function readCookie(header, name) {
     .split(";")
     .find((part) => part.trim().startsWith(`${name}=`));
   return match ? match.trim().slice(name.length + 1) : null;
+}
+
+/**
+ * Finds the signed-in user's ID from an unexpired session.
+ * @param {Database} database Database access.
+ * @param {string | undefined} cookieHeader Request cookies.
+ * @returns {Promise<number | null>}
+ */
+export async function getSessionUserId(database, cookieHeader) {
+  const token = readCookie(cookieHeader, "pt_session");
+
+  if (!token) return null;
+
+  const result = await database.query(
+    `SELECT u.id
+     FROM sessions s
+     JOIN users u ON u.id = s.user_id
+     WHERE s.token = $1 AND s.expires_at > NOW()`,
+    [token]
+  );
+
+  return result.rows[0]?.id ?? null;
 }
