@@ -55,12 +55,12 @@ Copy-Item .env.example .env
 
 Open `.env` and check these settings:
 
-| Setting | What to enter |
-| --- | --- |
-| `POSTGRES_DB` | `pricetrackers` |
-| `POSTGRES_USER` | `pricetrackers` |
-| `POSTGRES_PASSWORD` | Your own local development password |
-| `SERPAPI_API_KEY` | Your SerpAPI key, if you want live search |
+| Setting             | What to enter                             |
+| ------------------- | ----------------------------------------- |
+| `POSTGRES_DB`       | `pricetrackers`                           |
+| `POSTGRES_USER`     | `pricetrackers`                           |
+| `POSTGRES_PASSWORD` | Your own local development password       |
+| `SERPAPI_API_KEY`   | Your SerpAPI key, if you want live search |
 
 For live search, add `SERPAPI_API_KEY=your_key_here` to `.env`. The current
 `.env.example` includes `API_UNIT_KEY`, but the live-search code expects
@@ -125,13 +125,13 @@ in PostgreSQL.
 
 Open these addresses in your browser:
 
-| Address | What it does |
-| --- | --- |
-| [http://127.0.0.1:3000/health](http://127.0.0.1:3000/health) | Checks whether the backend responds |
-| [http://127.0.0.1:3000/ready](http://127.0.0.1:3000/ready) | Checks the database connection |
-| [http://127.0.0.1:3000/api/products](http://127.0.0.1:3000/api/products) | Lists the sample products |
-| [http://127.0.0.1:3000/api/products?search=headphones](http://127.0.0.1:3000/api/products?search=headphones) | Searches the sample data |
-| [http://127.0.0.1:3000/api/live-search?q=headphones](http://127.0.0.1:3000/api/live-search?q=headphones) | Gets live search results when SerpAPI is configured |
+| Address                                                                                                      | What it does                                        |
+| ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| [http://127.0.0.1:3000/health](http://127.0.0.1:3000/health)                                                 | Checks whether the backend responds                 |
+| [http://127.0.0.1:3000/ready](http://127.0.0.1:3000/ready)                                                   | Checks the database connection                      |
+| [http://127.0.0.1:3000/api/products](http://127.0.0.1:3000/api/products)                                     | Lists the sample products                           |
+| [http://127.0.0.1:3000/api/products?search=headphones](http://127.0.0.1:3000/api/products?search=headphones) | Searches the sample data                            |
+| [http://127.0.0.1:3000/api/live-search?q=headphones](http://127.0.0.1:3000/api/live-search?q=headphones)     | Gets live search results when SerpAPI is configured |
 
 To see a sample product's offers, use:
 
@@ -151,32 +151,32 @@ The `is_synthetic` field identifies our made-up offers.
 
 ## Sample data
 
-| Product | Walmart | Amazon | Expected result |
-| --- | ---: | ---: | --- |
-| Demo Wireless Headphones | $49.99 | $54.99 | Walmart is cheaper |
-| Demo Coffee Maker | $34.99 | $29.99 | Amazon is cheaper |
-| Demo USB-C Charger | $19.99 | $19.99 | Same price |
+| Product                  | Walmart | Amazon | Expected result    |
+| ------------------------ | ------: | -----: | ------------------ |
+| Demo Wireless Headphones |  $49.99 | $54.99 | Walmart is cheaper |
+| Demo Coffee Maker        |  $34.99 | $29.99 | Amazon is cheaper  |
+| Demo USB-C Charger       |  $19.99 | $19.99 | Same price         |
 
 A new database with the sample data should have 3 products, 2 retailers,
 and 6 offers. Running the seed command again should not add duplicates.
 
 ## How the code is organized
 
-| File or folder | What it is for |
-| --- | --- |
-| `frontend/` | Web pages, styles, and frontend JavaScript |
-| `src/server.js` | Sets up Express and API routes |
-| `src/Auth.js` | Handles accounts, passwords, and sessions |
-| `src/Wishlist.js` | Handles saved wishlist items |
-| `src/LiveSearch.js` | Gets live search results through SerpAPI |
-| `src/Database.js` | Manages database connections and queries |
+| File or folder             | What it is for                                    |
+| -------------------------- | ------------------------------------------------- |
+| `frontend/`                | Web pages, styles, and frontend JavaScript        |
+| `src/server.js`            | Sets up Express and API routes                    |
+| `src/Auth.js`              | Handles accounts, passwords, and sessions         |
+| `src/Wishlist.js`          | Handles saved wishlist items                      |
+| `src/LiveSearch.js`        | Gets live search results through SerpAPI          |
+| `src/Database.js`          | Manages database connections and queries          |
 | `src/ProductRepository.js` | Gets sample products and offers from the database |
-| `src/ComparisonService.js` | Finds the lowest sample price and handles ties |
-| `migrations/` | Creates and removes database tables |
-| `seeds/` | Adds sample products and prices |
-| `tests/unit/` | Tests comparison logic |
-| `tests/integration/` | Tests the API, accounts, wishlists, and database |
-| `.github/workflows/ci.yml` | Runs GitHub Actions checks |
+| `src/ComparisonService.js` | Finds the lowest sample price and handles ties    |
+| `migrations/`              | Creates and removes database tables               |
+| `seeds/`                   | Adds sample products and prices                   |
+| `tests/unit/`              | Tests comparison logic                            |
+| `tests/integration/`       | Tests the API, accounts, wishlists, and database  |
+| `.github/workflows/ci.yml` | Runs GitHub Actions checks                        |
 
 The database now has six tables: `products`, `retailers`, `offers`,
 `users`, `sessions`, and `wishlist_items`. Wishlist items belong to a
