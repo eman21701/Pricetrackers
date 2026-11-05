@@ -29,6 +29,7 @@
             <span class="title" id="title">Home</span>
           </span>
         </a>
+
         <div class="actions">
           <button
             class="icon-btn"
@@ -38,15 +39,18 @@
           >
             <i data-icon="moon"></i>
           </button>
+
           <button
             class="pill"
             id="basket-button"
             type="button"
             aria-label="Open basket"
           >
-            <i data-icon="bag"></i><span class="hide-sm">Basket</span
-            ><span id="basket-count">0</span>
+            <i data-icon="bag"></i>
+            <span class="hide-sm">Basket</span>
+            <span id="basket-count">0</span>
           </button>
+
           <button class="pill" id="who" type="button">Sign in</button>
         </div>
       </header>
@@ -55,14 +59,20 @@
 
       <nav class="nav" aria-label="Main">
         <span class="nav-glow" aria-hidden="true"></span>
+
         <button type="button" data-view="home">
-          <i data-icon="home"></i><span>Home</span>
+          <i data-icon="home"></i>
+          <span>Home</span>
         </button>
+
         <button type="button" data-view="search">
-          <i data-icon="search"></i><span>Search</span>
+          <i data-icon="search"></i>
+          <span>Search</span>
         </button>
+
         <button type="button" data-view="profile">
-          <i data-icon="user"></i><span>Profile</span>
+          <i data-icon="user"></i>
+          <span>Profile</span>
         </button>
       </nav>
     </main>
@@ -72,29 +82,41 @@
         <div class="auth-head">
           <div>
             <div class="auth-brand">
-              <img src="./logo-mark.png" alt="" width="52" height="52" /><span
-                >PriceTrackers</span
-              >
+              <img src="./logo-mark.png" alt="" width="52" height="52" />
+              <span>PriceTrackers</span>
             </div>
+
             <h2 id="auth-title">Welcome back</h2>
+
             <p class="notice">
               Sign in to keep a wishlist of items you're watching.
             </p>
           </div>
+
           <button
             class="icon-btn"
             id="close-auth"
             type="button"
-            aria-label="Close"
+            aria-label="Close authentication dialog"
           >
             <i data-icon="x"></i>
           </button>
         </div>
+
         <div class="seg" role="tablist" data-mode="login">
-          <button type="button" id="tab-in" role="tab">Sign in</button>
-          <button type="button" id="tab-up" role="tab">Create account</button>
+          <button type="button" id="tab-in" role="tab" aria-selected="true">
+            Sign in
+          </button>
+
+          <button type="button" id="tab-up" role="tab" aria-selected="false">
+            Create account
+          </button>
         </div>
+
+        <label class="sr-only" for="name">Name</label>
         <input id="name" placeholder="Name" autocomplete="name" hidden />
+
+        <label class="sr-only" for="email">Email</label>
         <input
           id="email"
           type="email"
@@ -102,6 +124,8 @@
           autocomplete="email"
           required
         />
+
+        <label class="sr-only" for="password">Password</label>
         <input
           id="password"
           type="password"
@@ -110,14 +134,19 @@
           autocomplete="current-password"
           required
         />
+
         <button class="solid" id="submit" type="submit">Sign in</button>
+
         <div class="divider">or</div>
+
         <a
           class="ghost google"
           id="google"
           href="http://127.0.0.1:3000/api/auth/google"
-          >Continue with Google</a
         >
+          Continue with Google
+        </a>
+
         <p class="notice" id="auth-notice" role="alert"></p>
       </form>
     </dialog>
@@ -129,6 +158,7 @@
             <h2 id="basket-title">Basket</h2>
             <p class="notice" id="basket-sub"></p>
           </div>
+
           <button
             class="icon-btn"
             id="close-basket"
@@ -138,12 +168,14 @@
             <i data-icon="x"></i>
           </button>
         </div>
+
         <div id="basket-list"></div>
         <div id="basket-summary"></div>
       </div>
     </dialog>
 
     <div class="toasts" id="toasts" aria-live="polite"></div>
+
     <script src="./app.js"></script>
   </body>
 </html>

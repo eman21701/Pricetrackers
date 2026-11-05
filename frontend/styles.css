@@ -5,7 +5,7 @@
   --surface: #ffffff;
   --surface-2: #eef7fc;
   --ink: #0b2a3c;
-  --muted: #557085;
+  --muted: #496274;
   --line: #d3e4ee;
   --grid: #d4e4ec;
   --tile: #e5f6ff;
@@ -14,7 +14,7 @@
   --brand-hover: #0a6496;
   --on-brand: #ffffff;
   --accent: #e64f33;
-  --accent-strong: #d0412a;
+  --accent-strong: #a83220;
   --accent-hover: #b83620;
   --accent-soft: #fde6e0;
   --accent-ink: #a3321b;
@@ -90,6 +90,19 @@
 * {
   box-sizing: border-box;
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -193,7 +206,7 @@ h2 {
   font-weight: 800;
   font-size: 1.25rem;
   line-height: 1;
-  color: var(--accent);
+  color: var(--accent-strong);
   text-transform: uppercase;
 }
 .title {
@@ -1131,7 +1144,7 @@ input[type="range"] {
   color: #ffffff;
 }
 .nav button.on {
-  color: #ff8a70;
+  color: #ffd1c7;
 }
 
 /* Dialogs */
@@ -1213,6 +1226,12 @@ dialog[open] {
   border-radius: 14px;
   background: var(--surface);
 }
+
+.auth input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 .auth input:focus {
   outline: none;
   border-color: var(--accent);
