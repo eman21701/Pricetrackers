@@ -138,7 +138,6 @@ const basketWindow = $("#basket-window");
 $$("[data-icon]").forEach((el) => {
   el.outerHTML = icons[el.dataset.icon] || "";
 });
-$("#google").href = `${apiBase}/api/auth/google`;
 
 /* ---------- Data ---------- */
 
