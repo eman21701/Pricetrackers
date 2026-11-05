@@ -1,0 +1,61 @@
+services:
+  performance-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pricetrackers_performance
+      POSTGRES_USER: pricetrackers_performance
+      POSTGRES_PASSWORD: local_performance_only
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U pricetrackers_performance -d pricetrackers_performance
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  performance-backend:
+    build: .
+    environment:
+      PORT: "3000"
+      PGHOST: performance-database
+      PGPORT: "5432"
+      PGDATABASE: pricetrackers_performance
+      PGUSER: pricetrackers_performance
+      PGPASSWORD: local_performance_only
+      SERPAPI_API_KEY: ""
+    command:
+      - /bin/sh
+      - -c
+      - >-
+        npx knex --knexfile knexfile.cjs --env development migrate:latest &&
+        npx knex --knexfile knexfile.cjs --env development seed:run &&
+        exec npm start
+    depends_on:
+      performance-database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "fetch('http://127.0.0.1:3000/ready').then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));"
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  performance-runner:
+    image: grafana/k6:2.3.0
+    user: "0:0"
+    environment:
+      BASE_URL: http://performance-backend:3000
+    volumes:
+      - ./tests/performance:/scripts:ro
+      - ./artifacts/performance:/artifacts
+    depends_on:
+      performance-backend:
+        condition: service_healthy
+    command:
+      - run
+      - --summary-export=/artifacts/k6-summary.json
+      - /scripts/api-load.js

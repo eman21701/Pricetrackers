@@ -210,3 +210,93 @@ jobs:
           path: artifacts/
           retention-days: 30
           if-no-files-found: warn
+
+  performance:
+    name: k6 load and stress benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Create performance artifact directory
+        run: mkdir -p artifacts/performance
+
+      - name: Run k6 load and stress benchmark
+        run: |
+          docker compose -p pricetrackers-performance -f compose.performance.yml \
+            run --rm -T performance-runner \
+            2>&1 | tee artifacts/performance/k6-console.log
+
+      - name: Collect performance service logs
+        if: ${{ always() }}
+        run: |
+          docker compose -p pricetrackers-performance -f compose.performance.yml \
+            logs --no-color performance-backend performance-database \
+            2>&1 | tee artifacts/performance/services.log
+
+      - name: Stop performance containers
+        if: ${{ always() }}
+        run: |
+          docker compose -p pricetrackers-performance -f compose.performance.yml \
+            down --volumes --remove-orphans
+
+      - name: Upload performance evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: performance-logs-${{ github.run_id }}
+          path: artifacts/performance/
+          retention-days: 30
+          if-no-files-found: warn  performance:
+    name: k6 load and stress benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Create performance artifact directory
+        run: mkdir -p artifacts/performance
+
+      - name: Run k6 load and stress benchmark
+        run: |
+          docker compose -p pricetrackers-performance -f compose.performance.yml \
+            run --rm -T performance-runner \
+            2>&1 | tee artifacts/performance/k6-console.log
+
+      - name: Collect performance service logs
+        if: ${{ always() }}
+        run: |
+          docker compose -p pricetrackers-performance -f compose.performance.yml \
+            logs --no-color performance-backend performance-database \
+            2>&1 | tee artifacts/performance/services.log
+
+      - name: Stop performance containers
+        if: ${{ always() }}
+        run: |
+          docker compose -p pricetrackers-performance -f compose.performance.yml \
+            down --volumes --remove-orphans
+
+      - name: Upload performance evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: performance-logs-${{ github.run_id }}
+          path: artifacts/performance/
+          retention-days: 30
+          if-no-files-found: warn
