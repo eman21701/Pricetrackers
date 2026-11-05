@@ -13,13 +13,13 @@
 
 ## Audit Coverage
 
-| Area | Verification | Result |
-| --- | --- | --- |
-| Color contrast | Axe scans of the home page, authentication dialog, and search results | Passed |
-| Keyboard navigation | Tab, Enter, and Escape navigation through primary controls | Passed |
-| Form accessibility | Explicit names for name, email, and password inputs | Passed |
-| Screen-reader semantics | Main and navigation landmarks, dialog names, button names, tabs, alerts, and live regions | Passed |
-| Responsive accessibility | Tests executed in desktop and mobile Chromium profiles | Passed |
+| Area                     | Verification                                                                              | Result |
+| ------------------------ | ----------------------------------------------------------------------------------------- | ------ |
+| Color contrast           | Axe scans of the home page, authentication dialog, and search results                     | Passed |
+| Keyboard navigation      | Tab, Enter, and Escape navigation through primary controls                                | Passed |
+| Form accessibility       | Explicit names for name, email, and password inputs                                       | Passed |
+| Screen-reader semantics  | Main and navigation landmarks, dialog names, button names, tabs, alerts, and live regions | Passed |
+| Responsive accessibility | Tests executed in desktop and mobile Chromium profiles                                    | Passed |
 
 ## Execution Results
 
