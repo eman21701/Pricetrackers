@@ -1,4 +1,5 @@
 import pg from "pg";
+import { writeLog } from "./Logger.js";
 
 const { Pool } = pg;
 
@@ -16,7 +17,9 @@ export class Database {
     });
 
     this.#pool.on("error", (error) => {
-      console.error("Idle database connection error:", error.message);
+      writeLog("error", "Idle database connection error", {
+        error_message: error.message
+      });
     });
   }
 

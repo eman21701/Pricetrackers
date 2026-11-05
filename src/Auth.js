@@ -69,6 +69,7 @@ export function registerAuth(app, database) {
     );
 
     await startSession(database, response, created.rows[0].id);
+    response.locals.userId = created.rows[0].id;
 
     return response.status(201).json({
       user: created.rows[0]
@@ -101,6 +102,7 @@ export function registerAuth(app, database) {
     }
 
     await startSession(database, response, user.id);
+    response.locals.userId = user.id;
 
     return response.json({
       user: {
@@ -129,13 +131,19 @@ export function registerAuth(app, database) {
       [token]
     );
 
-    return response.json({
-      user: found.rows[0] ?? null
-    });
+    const currentUser = found.rows[0] ?? null;
+    response.locals.userId = currentUser?.id ?? null;
+
+    return response.json({ user: currentUser });
   });
 
   app.post("/api/auth/logout", async (request, response) => {
     const token = readCookie(request.headers.cookie, "pt_session");
+
+    response.locals.userId = await getSessionUserId(
+      database,
+      request.headers.cookie
+    );
 
     if (token) {
       await database.query("DELETE FROM sessions WHERE token = $1", [token]);

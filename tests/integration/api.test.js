@@ -90,6 +90,10 @@ test("health and readiness report a working API and database", async () => {
   const health = await request("/health");
   assert.equal(health.status, 200);
   assert.equal(health.body.status, "ok");
+  assert.match(
+    health.headers.get("x-request-id"),
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  );
 
   const ready = await request("/ready");
   assert.equal(ready.status, 200);

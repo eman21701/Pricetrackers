@@ -4,6 +4,8 @@ import { ComparisonService } from "./ComparisonService.js";
 import { registerLiveSearch } from "./LiveSearch.js";
 import { registerAuth } from "./Auth.js";
 import { registerWishlist } from "./Wishlist.js";
+import { logRequest, writeLog } from "./Logger.js";
+
 /**
  * Configures the PriceTrackers HTTP API.
  */
@@ -23,13 +25,16 @@ export class PriceTrackersApplication {
 
     this.#app = express();
     this.#app.disable("x-powered-by");
+    this.#app.use(logRequest);
     this.#app.use(express.json());
+
     this.#app.use((request, response, next) => {
       const origin = request.headers.origin;
       const allowed = new Set([
         "http://127.0.0.1:4173",
         "http://localhost:4173"
       ]);
+
       if (origin && allowed.has(origin)) {
         response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -40,23 +45,11 @@ export class PriceTrackersApplication {
         );
         response.setHeader("Vary", "Origin");
       }
-      if (request.method === "OPTIONS") return response.sendStatus(204);
-      next();
-    });
 
-    this.#app.use((request, response, next) => {
-      const origin = request.headers.origin;
-      const allowed = new Set([
-        "http://127.0.0.1:4173",
-        "http://localhost:4173"
-      ]);
-      if (origin && allowed.has(origin)) {
-        response.setHeader("Access-Control-Allow-Origin", origin);
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Vary", "Origin");
+      if (request.method === "OPTIONS") {
+        return response.sendStatus(204);
       }
-      if (request.method === "OPTIONS") return response.sendStatus(204);
+
       next();
     });
 
@@ -76,10 +69,11 @@ export class PriceTrackersApplication {
           database: "connected"
         });
       } catch (error) {
-        console.error(
-          "Database readiness check failed:",
-          error instanceof Error ? error.message : String(error)
-        );
+        writeLog("error", "Database readiness check failed", {
+          request_id: response.locals.requestId,
+          user_id: response.locals.userId ?? null,
+          error_message: error instanceof Error ? error.message : String(error)
+        });
 
         response.status(503).json({
           status: "not_ready",
@@ -160,10 +154,11 @@ export class PriceTrackersApplication {
       response,
       _next
     ) => {
-      console.error(
-        "API request failed:",
-        error instanceof Error ? error.message : String(error)
-      );
+      writeLog("error", "API request failed", {
+        request_id: response.locals.requestId,
+        user_id: response.locals.userId ?? null,
+        error_message: error instanceof Error ? error.message : String(error)
+      });
 
       const invalidJson =
         typeof error === "object" &&
@@ -188,7 +183,7 @@ export class PriceTrackersApplication {
    */
   start(port) {
     return this.#app.listen(port, "0.0.0.0", () => {
-      console.log(`PriceTrackers API listening on port ${port}`);
+      writeLog("info", "PriceTrackers API listening", { port });
     });
   }
 }
