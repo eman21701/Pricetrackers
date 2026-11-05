@@ -1,3 +1,5 @@
+import { writeLog } from "./Logger.js";
+
 /**
  * @typedef {import("express").Express} ExpressApp
  * @typedef {import("express").Request} ExpressRequest
@@ -67,10 +69,11 @@ async function handleLiveSearch(request, response) {
       walmart: walmartOffers(walmart)
     });
   } catch (error) {
-    console.error(
-      "Live search failed:",
-      error instanceof Error ? error.message : String(error)
-    );
+    writeLog("error", "Live search failed", {
+      request_id: response.locals.requestId,
+      user_id: response.locals.userId ?? null,
+      error_message: error instanceof Error ? error.message : String(error)
+    });
 
     response.status(502).json({
       error: "Retailer search failed.",
