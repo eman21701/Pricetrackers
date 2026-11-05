@@ -1,0 +1,49 @@
+services:
+  e2e-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pricetrackers_e2e
+      POSTGRES_USER: pricetrackers_e2e
+      POSTGRES_PASSWORD: local_e2e_only
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U pricetrackers_e2e -d pricetrackers_e2e
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  e2e-runner:
+    image: mcr.microsoft.com/playwright:v1.65.0-noble
+    init: true
+    ipc: host
+    working_dir: /app
+    environment:
+      CI: "true"
+      NODE_ENV: test
+      PORT: "3000"
+      PGHOST: e2e-database
+      PGPORT: "5432"
+      PGDATABASE: pricetrackers_e2e
+      PGUSER: pricetrackers_e2e
+      PGPASSWORD: local_e2e_only
+      SERPAPI_API_KEY: ""
+    volumes:
+      - .:/app
+      - e2e_node_modules:/app/node_modules
+    depends_on:
+      e2e-database:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - >-
+        npm ci &&
+        npx knex --knexfile knexfile.cjs --env development migrate:latest &&
+        npx knex --knexfile knexfile.cjs --env development seed:run &&
+        npm run test:e2e
+
+volumes:
+  e2e_node_modules:

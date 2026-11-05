@@ -41,6 +41,11 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Playwright test evidence
+artifacts/
+playwright-report/
+test-results/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
