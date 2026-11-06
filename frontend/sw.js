@@ -1,4 +1,4 @@
-const CACHE = "pricetrackers-alpha-v5";
+const CACHE = "pricetrackers-v0.9.0-beta-v1";
 const ASSETS = [
   "./",
   "./index.html",
@@ -31,8 +31,15 @@ self.addEventListener("activate", (event) => {
 // Network first so code changes show up on reload; the cache is only a fallback when offline.
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  if (event.request.method !== "GET" || url.origin !== self.location.origin)
+  if (
+    event.request.method !== "GET" ||
+    url.origin !== self.location.origin ||
+    url.pathname.startsWith("/api/") ||
+    url.pathname === "/health" ||
+    url.pathname === "/ready"
+  ) {
     return;
+  }
   event.respondWith(
     fetch(event.request)
       .then((response) => {
