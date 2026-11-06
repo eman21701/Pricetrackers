@@ -40,10 +40,9 @@ The `/health` endpoint checks whether the backend responds. The `/ready` endpoin
 ### Human Review, Refactoring & Modifications Made:
 
 - Created the files, installed dependencies through Docker, and configured local environment variables.
-- Corrected Docker Compose indentation using AI troubleshooting guidance.
 - WSL was installed and the computer restarted to resolve Docker’s startup problem.
 - Ran the backend and checked its responses.
-- Independent architecture and code review by Eric and Katrina.
+- Independent architecture and code review by Eric, Katrina and Tako.
 
 ### Verification & Testing Method:
 
@@ -209,7 +208,7 @@ Evidence is recorded in issue #4.
 
 ## Audit Certification
 
-I certify as Team Lead that all entries above accurately represent AI usage within this project phase, all prompts have ben recorded, and all code has been validated by human review and automated testing.
+I certify as Team Lead that all entries above accurately represent AI usage within this project phase, all prompts have been recorded, and all code has been validated by human review and automated testing.
 
 **Team Lead Signature:** Eric Woods
 **Date:** 9/10/2026
@@ -245,3 +244,120 @@ Drafted the live-search route, the session-based auth module, the frontend, the 
 - `GET /api/live-search?q=blender` returned priced Walmart rows.
 - Signup and login returned the user and stored a session.
 - GitHub Actions quality and secret-scan logs are attached to the Prototype 2 issue.
+
+## Entry 6: Prototype 3 — Authentication and dependency hardening
+
+- **Date:** November 5, 2026
+- **Team Member:** Eric Woods (`@eman21701`)
+- **Tool Used:** ChatGPT
+- **Associated Git Issue:** Prototype 3 QA execution and bug log
+
+### Exact Prompt Submitted:
+
+> “I want some help with the authentication and dependency setup for
+> Prototype 3. I want you to review the current password storage against the project
+> requirements, replace the legacy password handling with bcrypt, enforce safe
+> password limits, and add regression coverage for both signup and login."
+
+### AI output and changes
+
+ChatGPT separated dependency audit findings from the passing integration and secret-scan jobs,
+and proposed non-forced package updates. It also reviewed the password implementation against the requirement and drafted the bcrypt conversion, 72-byte validation, and regression checks.
+
+### Human review and verification
+
+- Eric reviewed and saved `Auth.js`, `package.json`, and `package-lock.json`.
+- The bcrypt cost and password boundary were inspected in source.
+- Signup stored a non-plaintext bcrypt hash.
+- Correct and incorrect password cases were exercised.
+- `npm audit --audit-level=low` completed with zero vulnerabilities.
+- The full quality and integration jobs later passed in GitHub Actions.
+
+---
+
+## Entry 7: Prototype 3 — Structured logging and integration coverage
+
+- **Date:** November 5, 2026
+- **Team Member:** Eric Woods (`@eman21701`)
+- **Tool Used:** ChatGPT
+- **Associated Git Issue:** Prototype 3 QA execution and bug log
+
+### Consolidated Prompt Submitted:
+
+> “I need some help figuring out the operational logging and integration-test
+> requirements. I want you to add structured JSON logging with a timestamp, log level,
+> request ID, user ID, HTTP status, and duration, including safe handling for
+> unexpected errors. Add a focused logger unit test, then expand the existing
+> API integration test to cover health and readiness, authentication, session
+> invalidation, wishlist CRUD and ownership, soft deletion and restoration,
+> missing live-search configuration, migrations, repeatable seeds, and useful
+> error responses. The tests must use an isolated database and must not make
+> paid retailer requests.”
+
+### AI output and changes
+
+ChatGPT assisted in drafting `Logger.js`, request-correlation middleware, error logging,
+logger unit coverage, and expanded API integration coverage. The test changes
+covered authentication, session invalidation, wishlist ownership, soft
+deletion/restoration, missing retailer configuration, operational probes, and
+useful error responses.
+
+### Human review and verification
+
+- Eric checked that logs contain timestamp, level, request ID, user ID, status,
+  and duration without passwords or session tokens.
+- ESLint, type checking, and formatting passed.
+- Ten unit tests passed.
+- The combined isolated database run completed 19 tests with no failures.
+- Health, readiness, migrations, repeatable seeds, and account-backed wishlist
+  behavior were observed in the integration output.
+
+---
+
+## Entry 8: Prototype 3 — E2E, accessibility, and performance QA
+
+- **Date:** November 5, 2026
+- **Team Member:** Eric Woods (`@eman21701`)
+- **Tool Used:** ChatGPT
+- **Associated Git Issue:** Prototype 3 QA execution and bug log
+
+### Consolidated Prompt Submitted:
+
+> “Help me add complete end-to-end, accessibility, and performance testing for
+> our beta. I want you to create Playwright journeys for desktop and mobile
+> that covers things like search, filters, the basket, account creation, login/logout, and a
+> database-backed wishlist while replacing live retailer requests with a
+> deterministic fixture. Add Axe checks for WCAG 2.1 A and AA, keyboard
+> navigation, accessible names, dialogs, forms, and landmarks. Also add a k6
+> load-and-stress test with latency and failure thresholds and
+> upload all evidence through GitHub Actions.”
+
+### AI output and changes
+
+ChatGPT assisted in drafting Playwright desktop/mobile journeys, deterministic retailer
+fixtures, accessibility scans, keyboard and semantic assertions, k6 load/stress
+configuration, and CI artifact steps. It diagnosed duplicate form controls,
+missing labels, and contrast failures and proposed targeted HTML/CSS/test
+corrections.
+
+### Human review and verification
+
+- Eric saved and formatted the generated files and reran each failed case.
+- E2E progressed from 4 failed/6 passed, to 2 failed/8 passed, to 1 failed/9
+  passed, and finally 10 passed.
+- Final Axe artifacts contained zero automated WCAG 2.1 A/AA violations.
+- Keyboard navigation, dialog names, form labels, navigation landmarks, and
+  screen-reader control names passed in both projects.
+- The k6 scenario passed its check, failed-request, and p95 latency thresholds.
+- GitHub Actions uploaded Playwright, accessibility, and performance evidence.
+
+## Final Prototype 3 certification
+
+After the final CI run and tag verification, the Team Lead should certify that
+the prompt record is complete, the AI-assisted output was reviewed, and all
+claimed tests correspond to retained evidence.
+
+**Team Lead Signature:** Eric Woods  
+**Certification date:** November 5, 2026
+**Release evidence:** The `v0.9.0-beta` GitHub Release must link the final
+commit, QA issue, and successful workflow run.

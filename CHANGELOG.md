@@ -1,10 +1,50 @@
-# 0.1.0-alpha (2026-09-10)
+# Changelog
 
-### Features
+## 0.9.0-beta (2026-11-05)
 
-- add containerized Express health endpoint ([bf28756](https://github.com/eman21701/Pricetrackers/commit/bf28756a216034732bd2c43eca98be12ef85f241))
-- add database readiness endpoint ([b472ae0](https://github.com/eman21701/Pricetrackers/commit/b472ae0ff4dba3becbfd86984ab6cd63c86a5938))
-- add PostgreSQL service and environment configuration ([b77adcb](https://github.com/eman21701/Pricetrackers/commit/b77adcbc2c80db2ffaffc5500ec3d3d58f007147))
-- add product search and offer comparison endpoints ([f1eff2e](https://github.com/eman21701/Pricetrackers/commit/f1eff2e4c7340813ac6f25675671f8e90cbe909c))
-- add repeatable synthetic product and offer seeds ([76d4d9e](https://github.com/eman21701/Pricetrackers/commit/76d4d9e3c4c247303cce3b9ad490669b78a854b5))
-- add reversible product comparison schema ([01a828b](https://github.com/eman21701/Pricetrackers/commit/01a828b6e22f3bad7aff5381e48ad8f89f1b538e))
+### Added
+
+- Responsive PriceTrackers frontend with live Amazon and Walmart search,
+  filtering, sorting, comparison basket, and light/dark themes.
+- Email/password accounts with bcrypt password hashing and database-backed
+  seven-day sessions.
+- Database-backed wishlist CRUD, ownership checks, soft deletion, and target
+  prices.
+- Structured JSON operational logging with request and user correlation.
+- Desktop and mobile Playwright journeys, Axe WCAG 2.1 A/AA audits, integration
+  coverage thresholds, and k6 load/stress testing.
+- CI artifacts for quality, integration, secret scanning, E2E, accessibility,
+  and performance evidence.
+
+### Changed
+
+- Updated the service worker to use network-first asset refresh and to exclude
+  API and health endpoints from its cache.
+- Expanded CI to five independent release-verification jobs.
+- Updated project documentation for the feature-complete beta.
+
+### Security
+
+- Replaced legacy password handling with bcrypt at cost 12 and enforced
+  bcrypt's 72-byte password limit.
+- Added parameterized database access, authenticated wishlist ownership
+  checks, origin checks for state-changing wishlist requests, dependency
+  auditing, and repository secret scanning.
+- Verified the release dependency tree with zero reported npm vulnerabilities.
+
+### Known limitations
+
+- Google OAuth, password recovery, automatic target-price alerts, checkout,
+  production HTTPS/cookie hardening, and rate limiting are outside this beta.
+- Live results are retailer listings, not guaranteed product matches, and
+  exclude tax and shipping.
+
+## 0.1.0-alpha (2026-09-10)
+
+### Added
+
+- Containerized Express health endpoint.
+- PostgreSQL readiness endpoint and environment configuration.
+- Product search and stored-offer comparison endpoints.
+- Repeatable synthetic product and offer seeds.
+- Reversible product comparison schema.
