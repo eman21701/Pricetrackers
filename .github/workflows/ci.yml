@@ -99,9 +99,9 @@ jobs:
                 --test-concurrency=1 \
                 --experimental-test-coverage \
                 --test-coverage-include="src/**/*.js" \
-                --test-coverage-lines=60 \
-                --test-coverage-branches=60 \
-                --test-coverage-functions=60 \
+                --test-coverage-lines=85 \
+                --test-coverage-branches=85 \
+                --test-coverage-functions=85 \
                 tests/unit/*.test.js \
                 tests/integration/*.test.js
             ' 2>&1 | tee "$RUNNER_TEMP/integration/tests-and-coverage.log"
